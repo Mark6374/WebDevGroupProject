@@ -1,13 +1,13 @@
-from rest_framework.decorators import api_view, permission_classes  
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from django.contrib.auth.models import User
-from .serializers import RegisterSerializer, TransactionSerializer
 from .models import Transaction, Category
+from .serializers import RegisterSerializer, TransactionSerializer, CategorySerializer
 
-
+# FBV 1
 @api_view(['POST'])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
@@ -16,9 +16,9 @@ def register(request):
         return Response({"message": "User created"}, status=201)
     return Response(serializer.errors, status=400)
 
-
+# FBV 2
 @api_view(['GET'])
-@permission_classes([IsAuthenticated]) 
+@permission_classes([IsAuthenticated])
 def user_summary(request):
     total_income = Transaction.objects.total_by_user(request.user, 'income')
     total_expense = Transaction.objects.total_by_user(request.user, 'expense')
@@ -28,7 +28,7 @@ def user_summary(request):
         'balance': total_income - total_expense
     })
 
-
+# CBV 1
 class TransactionListCreate(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -44,7 +44,7 @@ class TransactionListCreate(APIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-
+# CBV 2
 class TransactionDetail(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -56,7 +56,7 @@ class TransactionDetail(APIView):
         except Transaction.DoesNotExist:
             return Response({"error": "Not found"}, status=404)
 
-
+# CBV category list
 class CategoryList(APIView):
     permission_classes = [IsAuthenticated]
     

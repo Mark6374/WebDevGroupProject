@@ -15,16 +15,12 @@ export class TransactionService {
     return this.http.get<Transaction[]>(`${this.apiUrl}/transactions/`);
   }
 
-  addTransaction(transaction: Partial<Transaction>): Observable<Transaction> {
+  addTransaction(transaction: any): Observable<Transaction> {
     return this.http.post<Transaction>(`${this.apiUrl}/transactions/`, transaction);
   }
 
   deleteTransaction(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/transactions/${id}/`);
-  }
-
-  updateTransaction(id: number, transaction: Partial<Transaction>): Observable<Transaction> {
-    return this.http.put<Transaction>(`${this.apiUrl}/transactions/${id}/`, transaction);
   }
 
   getSummary(): Observable<Summary> {

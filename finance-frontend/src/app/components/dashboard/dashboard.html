@@ -1,1 +1,64 @@
-<p>dashboard works!</p>
+<div class="dashboard">
+  <nav class="navbar">
+    <h1>Finance Tracker</h1>
+    <button (click)="logout()" class="btn-logout">Logout</button>
+  </nav>
+
+  <div class="error-toast" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="summary-cards">
+    <div class="card income">
+      <h3>Total Income</h3>
+      <p>{{ summary.total_income | currency:'KZT' }}</p>
+    </div>
+    <div class="card expense">
+      <h3>Total Expense</h3>
+      <p>{{ summary.total_expense | currency:'KZT' }}</p>
+    </div>
+    <div class="card balance" [class.positive]="summary.balance >= 0">
+      <h3>Balance</h3>
+      <p>{{ summary.balance | currency:'KZT' }}</p>
+    </div>
+  </div>
+
+  <div class="add-form">
+    <h3>Add Transaction</h3>
+    <div class="form-row">
+      <input type="number" [(ngModel)]="newTransaction.amount" placeholder="Amount" class="form-input">
+      <input type="text" [(ngModel)]="newTransaction.description" placeholder="Description" class="form-input">
+      <select [(ngModel)]="newTransaction.category" class="form-input">
+        <option [value]="null">Select Category</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">
+          {{ cat.name }} ({{ cat.type }})
+        </option>
+      </select>
+      <select [(ngModel)]="newTransaction.transaction_type" class="form-input">
+        <option value="expense">Expense</option>
+        <option value="income">Income</option>
+      </select>
+      <button (click)="addTransaction()" class="btn-add">Add</button>
+    </div>
+  </div>
+
+  <div class="transactions">
+    <h3>Recent Transactions</h3>
+    
+    <div *ngFor="let t of transactions">
+      <div class="transaction-item" [class.income-item]="t.transaction_type === 'income'">
+        <div class="transaction-info">
+          <span class="amount">{{ t.amount | currency:'KZT' }}</span>
+          <span class="description">{{ t.description || 'No description' }}</span>
+          <span class="category">{{ getCategoryName(t.category) }}</span>
+          <span class="date">{{ t.date | date:'shortDate' }}</span>
+        </div>
+        <button (click)="deleteTransaction(t.id!)" class="btn-delete">Delete</button>
+      </div>
+    </div>
+    
+    <div *ngIf="transactions.length === 0" class="empty-state">
+      <p>No transactions yet. Add your first transaction above!</p>
+    </div>
+  </div>
+</div>

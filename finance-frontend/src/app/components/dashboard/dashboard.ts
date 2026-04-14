@@ -1,13 +1,17 @@
-import { Component, OnInit } from '@angular/core';  
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { TransactionService } from '../../services/transaction';
 
+
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.css'],
-  standalone: false
+  styleUrls: ['./dashboard.css']
 })
 export class DashboardComponent implements OnInit {
   transactions: any[] = [];
@@ -34,45 +38,87 @@ export class DashboardComponent implements OnInit {
   }
 
   loadData() {
+    
     this.transactionService.getTransactions().subscribe({
-      next: (data) => this.transactions = data,
+      next: (data) => {
+        console.log('✅ Транзакции загружены:', data);
+        this.transactions = data;
+      },
       error: () => this.showError('Failed to load transactions')
     });
 
+    
     this.transactionService.getSummary().subscribe({
-      next: (data) => this.summary = data,
+      next: (data) => {
+        console.log('✅ Сводка загружена:', data);
+        this.summary = data;
+      },
       error: () => this.showError('Failed to load summary')
     });
 
+    
     this.transactionService.getCategories().subscribe({
-      next: (data) => this.categories = data,
-      error: () => this.showError('Failed to load categories')
+      next: (data) => {
+        console.log('✅ Категории загружены:', data);
+        this.categories = [...data];  
+        console.log('📋 this.categories после присвоения:', this.categories);
+      },
+      error: (err) => {
+        console.error('❌ Ошибка загрузки категорий:', err);
+        this.showError('Failed to load categories');
+      }
     });
   }
 
   addTransaction() {
-    if (!this.newTransaction.amount || !this.newTransaction.category) {
-      this.showError('Please fill amount and category');
-      return;
-    }
-
-    this.transactionService.addTransaction(this.newTransaction).subscribe({
-      next: () => {
-        this.loadData();
-        this.newTransaction = { amount: null, description: '', category: null, transaction_type: 'expense' };
-      },
-      error: () => this.showError('Failed to add transaction')
-    });
+  if (!this.newTransaction.amount || !this.newTransaction.category) {
+    this.showError('Please fill amount and category');
+    return;
   }
+
+  const transactionToAdd = { ...this.newTransaction };
+  
+  this.transactionService.addTransaction(transactionToAdd).subscribe({
+    next: () => {
+      
+      this.loadData();
+      
+      
+      this.newTransaction = { 
+        amount: null, 
+        description: '', 
+        category: null, 
+        transaction_type: 'expense' 
+      };
+    },
+    error: () => this.showError('Failed to add transaction')
+  });
+}
 
   deleteTransaction(id: number) {
-    if (confirm('Are you sure?')) {
-      this.transactionService.deleteTransaction(id).subscribe({
-        next: () => this.loadData(),
-        error: () => this.showError('Failed to delete transaction')
-      });
-    }
+  if (confirm('Are you sure?')) {
+    
+    const transactionToDelete = this.transactions.find(t => t.id === id);
+    
+    this.transactionService.deleteTransaction(id).subscribe({
+      next: () => {
+        
+        this.transactions = this.transactions.filter(t => t.id !== id);
+        
+        
+        if (transactionToDelete) {
+          if (transactionToDelete.transaction_type === 'income') {
+            this.summary.total_income -= transactionToDelete.amount;
+          } else {
+            this.summary.total_expense -= transactionToDelete.amount;
+          }
+          this.summary.balance = this.summary.total_income - this.summary.total_expense;
+        }
+      },
+      error: () => this.showError('Failed to delete transaction')
+    });
   }
+}
 
   logout() {
     this.authService.logout();

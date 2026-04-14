@@ -11,7 +11,7 @@ class RegisterSerializer(serializers.Serializer):
         user = User.objects.create_user(**validated_data)
         return user
 
-class CategorySerializer(serializers.ModelSerializer):  
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'

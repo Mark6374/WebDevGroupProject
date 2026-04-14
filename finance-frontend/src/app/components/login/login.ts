@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';  
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
-  styleUrls: ['./login.css'],
-  standalone: false
+  styleUrls: ['./login.css']
 })
 export class LoginComponent {
   username = '';
@@ -31,7 +34,7 @@ export class LoginComponent {
     });
   }
 
-  goToRegister() {
+  goToRegister() {  
     this.router.navigate(['/register']);
   }
 }

@@ -12,11 +12,10 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   login(username: string, password: string) {
-    return this.http.post<{ access: string; refresh: string }>(`${this.apiUrl}/login/`, { username, password })
+    return this.http.post<{ access: string }>(`${this.apiUrl}/login/`, { username, password })
       .pipe(
         tap(response => {
           localStorage.setItem('access_token', response.access);
-          localStorage.setItem('refresh_token', response.refresh);
         })
       );
   }
@@ -27,7 +26,6 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
     this.router.navigate(['/login']);
   }
 
