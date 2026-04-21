@@ -17,7 +17,12 @@ export const routes: Routes = [
   {path: 'crypto', component: CryptoComponent, canActivate: [AuthGuard]},
   {path: 'wallet', component: WalletComponent, canActivate: [AuthGuard]},
   {path: 'history',component: HistoryComponent, canActivate: [AuthGuard]},
+<<<<<<< HEAD
   {path: 'statistics',component: StatisticsComponent, canActivate: [AuthGuard]},
   {path: 'topup', component: TopupComponent, canActivate: [AuthGuard] },
+=======
+  { path: 'topup', component: TopupComponent, canActivate: [AuthGuard] },
+>>>>>>> 49a321ec71f7f597d60fda71a9d28f712337b2fc
   {path: '**', redirectTo: '/login' },
 ];
+
