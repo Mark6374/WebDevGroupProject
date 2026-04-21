@@ -169,3 +169,30 @@ class CryptoWalletView(APIView):
             'rank': profile.get_rank(),
             'balance': profile.balance,
         })
+    
+
+# endpoint
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def topup_balance(request):
+    amount = request.data.get('amount')
+    if not amount:
+        return Response({'error': 'amount required'}, status=400)
+    try:
+        amount = Decimal(str(amount))
+    except Exception:
+        return Response({'error': 'Invalid amount'}, status=400)
+    if amount <= 0:
+        return Response({'error': 'Amount must be positive'}, status=400)
+
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'balance': Decimal('50000')}
+    )
+    profile.balance += amount
+    profile.save()
+
+    return Response({
+        'message': 'Баланс толтырылды',
+        'new_balance': str(profile.balance)
+    }, status=200)

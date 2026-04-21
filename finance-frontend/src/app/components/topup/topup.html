@@ -1,0 +1,31 @@
+<div class="page-wrapper">
+  <header class="topbar">
+    <button (click)="goBack()" class="btn-back">← Назад</button>
+    <div class="topbar-title">Пополнение</div>
+  </header>
+
+  <div class="content">
+    <div class="amount-display">₸{{ (amount || 0) | number:'1.0-0' }}</div>
+
+    <div class="quick-grid">
+      <button (click)="quickSet(1000)">₸1,000</button>
+      <button (click)="quickSet(5000)">₸5,000</button>
+      <button (click)="quickSet(10000)">₸10,000</button>
+      <button (click)="quickSet(20000)">₸20,000</button>
+    </div>
+
+    <input
+      type="number"
+      [(ngModel)]="amount"
+      placeholder="Өз сомасын енгіз..."
+      class="custom-input"
+    />
+
+    <div *ngIf="successMsg" class="success-msg">✓ {{ successMsg }}</div>
+    <div *ngIf="errorMsg" class="error-msg">✗ {{ errorMsg }}</div>
+
+    <button (click)="submit()" [disabled]="loading" class="confirm-btn">
+      {{ loading ? 'Жүктелуде...' : '+ ПОПОЛНИТЬ' }}
+    </button>
+  </div>
+</div>

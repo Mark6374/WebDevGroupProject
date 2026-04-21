@@ -40,11 +40,12 @@
           <div class="stat-label">Total Invested ($)</div>
           <div class="stat-value">${{ totalInvested | number:'1.2-2' }}</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Balance (₸)</div>
-          <div class="stat-value acc">₸{{ balance | number:'1.0-0' }}</div>
-        </div>
-      </div>
+        <div class="stat-card" style="position:relative;">
+        <div class="stat-label">Balance (₸)</div>
+        <div class="stat-value acc">₸{{ balance | number:'1.0-0' }}</div>
+        <button (click)="goToTopup()" class="topup-btn">+ Пополнить</button>
+    </div>
+    </div>
 
       <div class="section-label">My Coins</div>
       <div style="padding:0 24px;">

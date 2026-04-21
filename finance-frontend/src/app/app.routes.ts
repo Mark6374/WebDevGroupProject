@@ -6,6 +6,7 @@ import { CryptoComponent } from './components/crypto/crypto';
 import { WalletComponent } from './components/wallet/wallet';
 import { HistoryComponent } from './components/history/history';
 import { AuthGuard } from './guards/auth.guard';
+import { TopupComponent } from './components/topup/topup';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -15,5 +16,7 @@ export const routes: Routes = [
   {path: 'crypto', component: CryptoComponent, canActivate: [AuthGuard]},
   {path: 'wallet', component: WalletComponent, canActivate: [AuthGuard]},
   {path: 'history',component: HistoryComponent, canActivate: [AuthGuard]},
+  { path: 'topup', component: TopupComponent, canActivate: [AuthGuard] },
   {path: '**', redirectTo: '/login' },
 ];
+
