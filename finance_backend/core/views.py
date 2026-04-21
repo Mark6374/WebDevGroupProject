@@ -241,7 +241,6 @@ class CryptoWalletView(APIView):
             'rank': profile.get_rank(),
             'balance': profile.balance,
         })
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def topup_balance(request):
