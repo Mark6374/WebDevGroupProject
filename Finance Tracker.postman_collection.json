@@ -1,0 +1,182 @@
+{
+  "info": {
+    "_postman_id": "9831e472-d1d1-4b0d-845a-5b757dbcc9cf",
+    "name": "Finance Tracker",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53642181"
+  },
+  "item": [
+    {
+      "name": "Login Api admin",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/login/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "login",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add New Category",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2ODU2MDYyLCJpYXQiOjE3NzY3Njk2NjIsImp0aSI6IjljMzI3ZjQzYjI0YzQ0MDhhOWE3ZWExMzM1YjkyNDRmIiwidXNlcl9pZCI6IjIifQ.HWIUvEVFBWlzpWB29CBf3gDqzwuKevfWIYoLn8Jcwzk",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Freelance\", \"type\": \"income\"}\n{\"name\": \"Rental Income\", \"type\": \"income\"}\n{\"name\": \"Dividends\", \"type\": \"income\"}\n{\"name\": \"Interest\", \"type\": \"income\"}\n{\"name\": \"Gifts\", \"type\": \"income\"}\n{\"name\": \"Bonus\", \"type\": \"income\"}\n{\"name\": \"Cashback\", \"type\": \"income\"}\n{\"name\": \"Tax Refund\", \"type\": \"income\"}\n{\"name\": \"Sale of Items\", \"type\": \"income\"}\n{\"name\": \"Crypto Gains\", \"type\": \"income\"}\n{\"name\": \"Stock Trading\", \"type\": \"income\"}\n{\"name\": \"Business Income\", \"type\": \"income\"}\n{\"name\": \"Scholarship\", \"type\": \"income\"}\n{\"name\": \"Refunds\", \"type\": \"income\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/categories/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "categories",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all categories",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2ODU2MDYyLCJpYXQiOjE3NzY3Njk2NjIsImp0aSI6IjljMzI3ZjQzYjI0YzQ0MDhhOWE3ZWExMzM1YjkyNDRmIiwidXNlcl9pZCI6IjIifQ.HWIUvEVFBWlzpWB29CBf3gDqzwuKevfWIYoLn8Jcwzk",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/categories/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "categories",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete CATEGORY",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2ODU2MDYyLCJpYXQiOjE3NzY3Njk2NjIsImp0aSI6IjljMzI3ZjQzYjI0YzQ0MDhhOWE3ZWExMzM1YjkyNDRmIiwidXNlcl9pZCI6IjIifQ.HWIUvEVFBWlzpWB29CBf3gDqzwuKevfWIYoLn8Jcwzk",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/api/categories/3/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "categories",
+            "3",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Transactions",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc2ODU2MDYyLCJpYXQiOjE3NzY3Njk2NjIsImp0aSI6IjljMzI3ZjQzYjI0YzQ0MDhhOWE3ZWExMzM1YjkyNDRmIiwidXNlcl9pZCI6IjIifQ.HWIUvEVFBWlzpWB29CBf3gDqzwuKevfWIYoLn8Jcwzk",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"amount\": 5000,\n    \"category\": 2,\n    \"transaction_type\": \"expense\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8000/api/transactions/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "transactions",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
