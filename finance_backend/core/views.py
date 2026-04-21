@@ -34,7 +34,7 @@ class TransactionListCreate(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        transactions = Transaction.objects.filter(user=request.user).order_by('-date')
+        transactions = Transaction.objects.filter(user=request.user).order_by('date')
         serializer = TransactionSerializer(transactions, many=True)
         return Response(serializer.data)
     
@@ -105,7 +105,7 @@ def buy_crypto(request):
         return Response({'error': 'symbol, amount and price_usd are required'}, status=400)
 
     try:
-        amount    = Decimal(str(amount))
+        amount = Decimal(str(amount))
         price_usd = Decimal(str(price_usd))
     except Exception:
         return Response({'error': 'Invalid amount or price_usd'}, status=400)
@@ -140,7 +140,7 @@ def buy_crypto(request):
     )
 
     crypto_cat, _ = Category.objects.get_or_create(
-        name='Крипто-покупка', defaults={'type': 'expense'}
+        name='Crypto', defaults={'type': 'expense'}
     )
     Transaction.objects.create(
         user=request.user,
