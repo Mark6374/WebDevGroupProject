@@ -1,0 +1,61 @@
+.hist-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 20px 24px 0;
+  margin-bottom: 4px;
+}
+
+.hist-sum-card {
+  background: var(--c2);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--c3);
+  text-align: center;
+}
+
+.hist-sum-label {
+  font-size: 10px;
+  color: var(--txt3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.hist-sum-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.hist-sum-card.income .hist-sum-val  { color: var(--green); }
+.hist-sum-card.expense .hist-sum-val { color: var(--red); }
+.hist-sum-card.crypto .hist-sum-val  { color: var(--acc); }
+
+.hist-filters {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px 8px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+}
+
+.hist-filters::-webkit-scrollbar { display: none; }
+
+.hist-filters button {
+  font-family: 'Syne', sans-serif;
+  padding: 6px 14px;
+  background: var(--c3);
+  border: 1px solid var(--c4);
+  border-radius: 20px;
+  color: var(--txt3);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hist-filters button:hover { border-color: var(--acc); color: var(--txt2); }
+.hist-filters button.active { background: var(--acc); color: #000; border-color: var(--acc); }

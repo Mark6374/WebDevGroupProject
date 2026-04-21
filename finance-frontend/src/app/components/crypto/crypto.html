@@ -1,0 +1,87 @@
+<div class="page-wrapper">
+
+  <div *ngIf="errorMessage" class="error-toast">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-toast">{{ successMessage }}</div>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="logo">🪙</span>
+      <div class="name">Crypto Market</div>
+    </div>
+    <button (click)="fetchPrices()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;"> ⟳ Update</button>
+  </header>
+
+  <div class="content-scroll">
+
+    @if (loading) {
+      <div class="empty-state" style="padding-top:60px;">
+        <div class="empty-icon">⏳</div>
+        <p>Loading prices...</p>
+      </div>
+    }
+
+    @if (!loading) {
+      <div class="section-label">Select a coin</div>
+      <div class="coin-grid" style="padding:0 24px;">
+        @for (coin of coins; track coin.sym) {
+          <div class="coin-card" [class.selected]="selectedCoin?.sym === coin.sym" (click)="selectCoin(coin)">
+            <div class="coin-sym">{{ coin.sym }}</div>
+            <div class="coin-name">{{ coin.name }}</div>
+            <div class="coin-price">${{ coin.price | number:'1.2-2' }}</div>
+            <div class="coin-change" [class.pos]="coin.change >= 0" [class.neg]="coin.change < 0">
+              {{ coin.change >= 0 ? '▲' : '▼' }} {{ (coin.change < 0 ? -coin.change : coin.change) | number:'1.2-2' }}%
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (selectedCoin) {
+        <div class="chart-box">
+          <div class="chart-head">
+            <span>{{ selectedCoin.sym }} / USD - 24h</span>
+            <span class="chart-price">${{ selectedCoin.price | number:'1.2-2' }}</span>
+          </div>
+          <svg id="crypto-chart-svg" viewBox="0 0 300 90" class="chart-svg" preserveAspectRatio="none"></svg>
+        </div>
+
+        <div class="buy-panel">
+          <div class="buy-panel-head">
+            <span>Купить {{ selectedCoin.sym }}</span>
+            <span class="buy-price-hint">≈ ₸{{ selectedCoin.price * KZT_PER_USD | number:'1.0-0' }} / coin</span>
+          </div>
+          <div class="buy-input-row">
+            <div class="form-group" style="flex:1;">
+              <label>Quantity</label>
+              <input type="number" [(ngModel)]="buyAmount" placeholder="0.001" step="0.001" min="0" />
+            </div>
+          </div>
+          @if (buyAmount && buyAmount > 0) {
+            <div class="buy-summary">
+              <div class="buy-sum-row">
+                <span>{{ buyAmount }} {{ selectedCoin.sym }}</span>
+                <span>${{ totalCostUSD | number:'1.2-2' }}</span>
+              </div>
+              <div class="buy-sum-row accent">
+                <span>Total to pay</span>
+                <span>₸{{ totalCostKZT | number:'1.0-0' }}</span>
+              </div>
+            </div>
+          }
+          <button class="btn btn-acc btn-full" style="margin-top:14px;" (click)="buyCrypto()" [disabled]="buying">
+            {{ buying ? 'Purchasing...' : '🚀 Buy' }}
+          </button>
+        </div>
+      }
+
+      @if (!selectedCoin) {
+        <div class="empty-state">
+          <div class="empty-icon">👆</div>
+          <p>Select a coin above to buy</p>
+        </div>
+      }
+    }
+
+  </div>
+
+  <app-navbar></app-navbar>
+</div>

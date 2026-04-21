@@ -1,0 +1,81 @@
+<div class="page-wrapper">
+
+  <div *ngIf="errorMessage" class="error-toast">{{ errorMessage }}</div>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="logo">📋</span>
+      <div class="name">History</div>
+    </div>
+    <button (click)="loadAll()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;">⟳</button>
+  </header>
+
+  <div class="content-scroll">
+
+    @if (loading) {
+      <div class="empty-state" style="padding-top:60px;">
+        <div class="empty-icon">⏳</div>
+        <p>Loading history...</p>
+      </div>
+    }
+
+    @if (!loading) {
+
+      <div class="hist-summary">
+        <div class="hist-sum-card income">
+          <div class="hist-sum-label">Income</div>
+          <div class="hist-sum-val">+₸{{ totalIncome | number:'1.0-0' }}</div>
+        </div>
+        <div class="hist-sum-card expense">
+          <div class="hist-sum-label">Expense</div>
+          <div class="hist-sum-val">-₸{{ totalExpense | number:'1.0-0' }}</div>
+        </div>
+        <div class="hist-sum-card crypto">
+          <div class="hist-sum-label">Crypto</div>
+          <div class="hist-sum-val">-₸{{ totalCrypto | number:'1.0-0' }}</div>
+        </div>
+      </div>
+
+      <div class="hist-filters">
+        <button [class.active]="filter === 'all'"     (click)="setFilter('all')">All ({{ allItems.length }})</button>
+        <button [class.active]="filter === 'income'"  (click)="setFilter('income')">Income</button>
+        <button [class.active]="filter === 'expense'" (click)="setFilter('expense')">Expense</button>
+        <button [class.active]="filter === 'crypto'"  (click)="setFilter('crypto')">Crypto</button>
+      </div>
+
+      <div style="padding:0 24px;">
+        @if (filtered.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">🗒️</div>
+            <p>No records in this category</p>
+          </div>
+        }
+        <div class="tx-list">
+          @for (item of filtered; track item.id) {
+            <div class="tx-item">
+              <div class="tx-left">
+                <div class="tx-icon" [class]="item.type">
+                  @if (item.type === 'income')  { ↑ }
+                  @if (item.type === 'expense') { ↓ }
+                  @if (item.type === 'crypto')  { 🪙 }
+                </div>
+                <div>
+                  <div class="tx-desc">{{ item.description }}</div>
+                  <div class="tx-sub">{{ item.date | date:'dd.MM.yyyy' }}</div>
+                </div>
+              </div>
+              <div class="tx-amount" [class]="item.type">
+                @if (item.type === 'income')  { +₸{{ item.amount_kzt | number:'1.0-0' }} }
+                @if (item.type === 'expense') { -₸{{ item.amount_kzt | number:'1.0-0' }} }
+                @if (item.type === 'crypto')  { -₸{{ item.amount_kzt | number:'1.0-0' }} }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+    }
+  </div>
+
+  <app-navbar></app-navbar>
+</div>

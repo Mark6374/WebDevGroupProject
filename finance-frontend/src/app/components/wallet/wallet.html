@@ -1,0 +1,105 @@
+<div class="page-wrapper">
+
+  <div *ngIf="errorMessage" class="error-toast">{{ errorMessage }}</div>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="logo">💰</span>
+      <div class="name">FinVault</div>
+    </div>
+    <button (click)="loadWallet()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;">⟳</button>
+  </header>
+
+  <div class="content-scroll">
+
+    @if (loading) {
+      <div class="empty-state" style="padding-top:60px;">
+        <div class="empty-icon">⏳</div>
+        <p>Loading data...</p>
+      </div>
+    }
+
+    @if (!loading) {
+
+      <div class="rank-bar">
+        <div class="rank-icon" [style.background]="rankConfig.bg">{{ rankConfig.icon }}</div>
+        <div class="rank-info">
+          <div class="rank-name" [style.color]="rankConfig.color">
+            {{ rankConfig.label }}
+            <span style="font-size:12px;color:var(--txt3);font-weight:400;margin-left:6px;">{{ xp }} XP</span>
+          </div>
+          <div class="rank-xp-track">
+            <div class="rank-xp-fill" [style.width.%]="rankProgress" [style.background]="rankConfig.color"></div>
+          </div>
+          <div class="rank-xp-sub">{{ nextRankLabel }}</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:1fr 1fr;padding:16px 24px 0;">
+        <div class="stat-card">
+          <div class="stat-label">Total Invested ($)</div>
+          <div class="stat-value">${{ totalInvested | number:'1.2-2' }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Balance (₸)</div>
+          <div class="stat-value acc">₸{{ balance | number:'1.0-0' }}</div>
+        </div>
+      </div>
+
+      <div class="section-label">My Coins</div>
+      <div style="padding:0 24px;">
+        @if (holdings.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">💎</div>
+            <p>No assets. Buy your first coin!</p>
+          </div>
+        }
+        <div class="tx-list">
+          @for (h of holdings; track h.symbol) {
+            <div class="tx-item">
+              <div class="tx-left">
+                <div class="tx-icon crypto" style="font-size:18px;font-weight:700;">{{ coinEmoji(h.symbol) }}</div>
+                <div>
+                  <div class="tx-desc">{{ h.symbol }}</div>
+                  <div class="tx-sub">{{ h.amount | number:'1.4-8' }} coins</div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div class="tx-amount crypto">${{ h.invested_usd | number:'1.2-2' }}</div>
+                <div style="font-size:11px;color:var(--txt3);">invested</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:8px;">Transaction History</div>
+      <div style="padding:0 24px;">
+        @if (transactions.length === 0) {
+          <div class="empty-state">
+            <div class="empty-icon">📈</div>
+            <p>No transactions yet</p>
+          </div>
+        }
+        <div class="tx-list">
+          @for (t of transactions.slice().reverse(); track t.id) {
+            <div class="tx-item">
+              <div class="tx-left">
+                <div class="tx-icon crypto">🪙</div>
+                <div>
+                  <div class="tx-desc">Purchased {{ t.amount_coin | number:'1.4-8' }} {{ t.symbol }}</div>
+                  <div class="tx-sub">at ${{ t.price_usd | number:'1.2-2' }} · {{ t.date | date:'dd.MM.yyyy' }}</div>
+                </div>
+              </div>
+              <div class="tx-amount expense">-₸{{ t.cost_kzt | number:'1.0-0' }}</div>
+            </div>
+          }
+        </div>
+      </div>
+
+    }
+
+  </div>
+
+  <app-navbar></app-navbar>
+</div>

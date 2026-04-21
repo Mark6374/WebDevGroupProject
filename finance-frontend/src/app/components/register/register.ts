@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './register.html',
-  styleUrls: ['./register.css']
+  styleUrls: ['./register.css'],
 })
 export class RegisterComponent {
   username = '';
@@ -23,33 +23,25 @@ export class RegisterComponent {
 
   onSubmit() {
     if (!this.username || !this.email || !this.password || !this.confirmPassword) {
-      this.errorMessage = 'Please fill all fields';
+      this.errorMessage = 'Please fill in all fields';
       return;
     }
-
     if (this.password !== this.confirmPassword) {
       this.errorMessage = 'Passwords do not match';
       return;
     }
-
-    this.authService.register({
-      username: this.username,
-      email: this.email,
-      password: this.password
-    }).subscribe({
+    this.authService.register({ username: this.username, email: this.email, password: this.password }).subscribe({
       next: () => {
-        this.successMessage = 'Registration successful! Please login.';
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
+        this.successMessage = 'Account created! Redirecting...';
+        setTimeout(() => this.router.navigate(['/login']), 1800);
       },
       error: () => {
-        this.errorMessage = 'Username already exists or invalid data';
-      }
+        this.errorMessage = 'Username is already taken or invalid data entered';
+      },
     });
   }
 
-  goToLogin() {  
+  goToLogin() {
     this.router.navigate(['/login']);
   }
 }

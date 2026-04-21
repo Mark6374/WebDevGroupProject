@@ -1,64 +1,123 @@
-<div class="dashboard">
-  <nav class="navbar">
-    <h1>Finance Tracker</h1>
-    <button (click)="logout()" class="btn-logout">Logout</button>
-  </nav>
+<div class="page-wrapper">
 
-  <div class="error-toast" *ngIf="errorMessage">
-    {{ errorMessage }}
-  </div>
+  <div *ngIf="errorMessage" class="error-toast">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-toast">{{ successMessage }}</div>
 
-  <div class="summary-cards">
-    <div class="card income">
-      <h3>Total Income</h3>
-      <p>{{ summary.total_income | currency:'KZT' }}</p>
-    </div>
-    <div class="card expense">
-      <h3>Total Expense</h3>
-      <p>{{ summary.total_expense | currency:'KZT' }}</p>
-    </div>
-    <div class="card balance" [class.positive]="summary.balance >= 0">
-      <h3>Balance</h3>
-      <p>{{ summary.balance | currency:'KZT' }}</p>
-    </div>
-  </div>
-
-  <div class="add-form">
-    <h3>Add Transaction</h3>
-    <div class="form-row">
-      <input type="number" [(ngModel)]="newTransaction.amount" placeholder="Amount" class="form-input">
-      <input type="text" [(ngModel)]="newTransaction.description" placeholder="Description" class="form-input">
-      <select [(ngModel)]="newTransaction.category" class="form-input">
-        <option [value]="null">Select Category</option>
-        <option *ngFor="let cat of categories" [value]="cat.id">
-          {{ cat.name }} ({{ cat.type }})
-        </option>
-      </select>
-      <select [(ngModel)]="newTransaction.transaction_type" class="form-input">
-        <option value="expense">Expense</option>
-        <option value="income">Income</option>
-      </select>
-      <button (click)="addTransaction()" class="btn-add">Add</button>
-    </div>
-  </div>
-
-  <div class="transactions">
-    <h3>Recent Transactions</h3>
-    
-    <div *ngFor="let t of transactions">
-      <div class="transaction-item" [class.income-item]="t.transaction_type === 'income'">
-        <div class="transaction-info">
-          <span class="amount">{{ t.amount | currency:'KZT' }}</span>
-          <span class="description">{{ t.description || 'No description' }}</span>
-          <span class="category">{{ getCategoryName(t.category) }}</span>
-          <span class="date">{{ t.date | date:'shortDate' }}</span>
-        </div>
-        <button (click)="deleteTransaction(t.id!)" class="btn-delete">Delete</button>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="logo">💎</span>
+      <div>
+        <div class="name">FinVault</div>
+        <div style="font-size:11px;color:var(--txt3);">Привет, {{ username }}!</div>
       </div>
     </div>
-    
-    <div *ngIf="transactions.length === 0" class="empty-state">
-      <p>No transactions yet. Add your first transaction above!</p>
+    <div class="topbar-right">
+      <span class="topbar-balance">₸{{ summary.balance | number:'1.0-0' }}</span>
+      <button (click)="logout()" class="btn btn-danger" style="font-size:12px;padding:7px 12px;">Logout</button>
     </div>
+  </header>
+
+  <div class="content-scroll">
+
+    <div class="rank-bar">
+      <div class="rank-icon" [style.background]="rankConfig.bg">{{ rankConfig.icon }}</div>
+      <div class="rank-info">
+        <div class="rank-name" [style.color]="rankConfig.color">
+          {{ rankConfig.label }}
+          <span style="font-size:12px;color:var(--txt3);font-weight:400;margin-left:6px;">{{ profile.xp }} XP</span>
+        </div>
+        <div class="rank-xp-track">
+          <div class="rank-xp-fill" [style.width.%]="rankProgress" [style.background]="rankConfig.color"></div>
+        </div>
+        <div class="rank-xp-sub">{{ nextRankLabel }}</div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Income</div>
+        <div class="stat-value green">₸{{ summary.total_income | number:'1.0-0' }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Expense</div>
+        <div class="stat-value red">₸{{ summary.total_expense | number:'1.0-0' }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Balance</div>
+        <div class="stat-value acc">₸{{ summary.balance | number:'1.0-0' }}</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;padding:16px 24px 0;">
+      <button class="btn btn-acc" style="flex:1;" routerLink="/crypto">🪙 Crypto wallet</button>
+      <button class="btn btn-ghost" style="flex:1;" routerLink="/history">📋 History</button>
+    </div>
+
+    <div class="form-section">
+      <h3>Add Transaction</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Amount (₸)</label>
+          <input type="number" [(ngModel)]="newTransaction.amount" placeholder="0.00" />
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select [(ngModel)]="newTransaction.transaction_type">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="newTransaction.category">
+            <option [value]="null">Select...</option>
+            @for (cat of categories; track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" [(ngModel)]="newTransaction.description" placeholder="Description(Optional)" />
+        </div>
+      </div>
+      <button (click)="addTransaction()" class="btn btn-acc btn-full" style="margin-top:12px;">
+        + Add Transaction
+      </button>
+    </div>
+
+    <div class="section-label">Recent Transactions</div>
+    <div style="padding:0 24px;">
+      @if (transactions.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>No transactions yet. Add your first one!</p>
+        </div>
+      }
+      <div class="tx-list">
+        @for (t of transactions.slice().reverse().slice(0, 10); track t.id) {
+          <div class="tx-item">
+            <div class="tx-left">
+              <div class="tx-icon" [class]="t.transaction_type">
+                {{ t.transaction_type === 'income' ? '↑' : '↓' }}
+              </div>
+              <div>
+                <div class="tx-desc">{{ t.description || getCategoryName(t.category) }}</div>
+                <div class="tx-sub">{{ getCategoryName(t.category) }} · {{ t.date | date:'dd.MM.yyyy' }}</div>
+              </div>
+            </div>
+            <div>
+              <div class="tx-amount" [class]="t.transaction_type">
+                {{ t.transaction_type === 'income' ? '+' : '-' }}₸{{ t.amount | number:'1.0-0' }}
+              </div>
+              <button (click)="deleteTransaction(t.id)" class="btn-del">✕</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
   </div>
+
+  <app-navbar></app-navbar>
 </div>

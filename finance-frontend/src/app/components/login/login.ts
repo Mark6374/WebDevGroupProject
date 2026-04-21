@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
-  styleUrls: ['./login.css']
+  styleUrls: ['./login.css'],
 })
 export class LoginComponent {
   username = '';
@@ -20,21 +20,21 @@ export class LoginComponent {
 
   onSubmit() {
     if (!this.username || !this.password) {
-      this.errorMessage = 'Please fill all fields';
+      this.errorMessage = 'Please enter both username and password';
       return;
     }
-
     this.authService.login(this.username, this.password).subscribe({
       next: () => {
+        localStorage.setItem('username', this.username);
         this.router.navigate(['/dashboard']);
       },
       error: () => {
-        this.errorMessage = 'Invalid credentials';
-      }
+        this.errorMessage = 'Invalid username or password';
+      },
     });
   }
 
-  goToRegister() {  
+  goToRegister() {
     this.router.navigate(['/register']);
   }
 }

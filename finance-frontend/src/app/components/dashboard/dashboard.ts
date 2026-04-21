@@ -1,136 +1,164 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth';
-import { TransactionService } from '../../services/transaction';
-
+import { NavbarComponent } from '../navbar/navbar';
+import { RANK_CONFIG } from '../../models/transaction.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent],
   templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.css']
+  styleUrls: ['./dashboard.css'],
 })
 export class DashboardComponent implements OnInit {
   transactions: any[] = [];
   categories: any[] = [];
   summary = { total_income: 0, total_expense: 0, balance: 0 };
-  
+  profile = { xp: 0, rank: 'bronze', balance: 0 };
+  errorMessage = '';
+  successMessage = '';
+
   newTransaction = {
     amount: null as number | null,
     description: '',
     category: null as number | null,
-    transaction_type: 'expense'
+    transaction_type: 'expense',
   };
 
-  errorMessage = '';
+  private apiUrl = 'http://localhost:8000/api';
 
   constructor(
-    private transactionService: TransactionService,
+    private http: HttpClient,
     private authService: AuthService,
-    private router: Router
+    private cdr: ChangeDetectorRef,
+    public router: Router
   ) {}
 
   ngOnInit() {
-    this.loadData();
+    this.loadAll();
   }
 
-  loadData() {
-    
-    this.transactionService.getTransactions().subscribe({
-      next: (data) => {
-        console.log('✅ Транзакции загружены:', data);
-        this.transactions = data;
-      },
-      error: () => this.showError('Failed to load transactions')
-    });
+  loadAll() {
+    this.loadCategories();
+    this.loadTransactions();
+    this.loadSummary();
+    this.loadProfile();
+  }
 
-    
-    this.transactionService.getSummary().subscribe({
+  loadCategories() {
+    this.http.get<any[]>(`${this.apiUrl}/categories/`).subscribe({
       next: (data) => {
-        console.log('✅ Сводка загружена:', data);
+        this.categories = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => this.showError('Categories: ' + err.status),
+    });
+  }
+
+  loadTransactions() {
+    this.http.get<any[]>(`${this.apiUrl}/transactions/`).subscribe({
+      next: (data) => {
+        this.transactions = data.filter((t: any) => t.transaction_type !== 'crypto');
+        this.cdr.detectChanges();
+      },
+      error: (err) => this.showError('Transactions: ' + err.status),
+    });
+  }
+
+  loadSummary() {
+    this.http.get<any>(`${this.apiUrl}/summary/`).subscribe({
+      next: (data) => {
         this.summary = data;
+        this.cdr.detectChanges();
       },
-      error: () => this.showError('Failed to load summary')
+      error: (err) => this.showError('Summary: ' + err.status),
     });
+  }
 
-    
-    this.transactionService.getCategories().subscribe({
+  loadProfile() {
+    this.http.get<any>(`${this.apiUrl}/crypto/wallet/`).subscribe({
       next: (data) => {
-        console.log('✅ Категории загружены:', data);
-        this.categories = [...data];  
-        console.log('📋 this.categories после присвоения:', this.categories);
+        this.profile = data;
+        this.summary.balance = parseFloat(data.balance);
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('❌ Ошибка загрузки категорий:', err);
-        this.showError('Failed to load categories');
-      }
+      error: () => {},
     });
   }
 
   addTransaction() {
-  if (!this.newTransaction.amount || !this.newTransaction.category) {
-    this.showError('Please fill amount and category');
-    return;
-  }
-
-  const transactionToAdd = { ...this.newTransaction };
-  
-  this.transactionService.addTransaction(transactionToAdd).subscribe({
-    next: () => {
-      
-      this.loadData();
-      
-      
-      this.newTransaction = { 
-        amount: null, 
-        description: '', 
-        category: null, 
-        transaction_type: 'expense' 
-      };
-    },
-    error: () => this.showError('Failed to add transaction')
-  });
-}
-
-  deleteTransaction(id: number) {
-  if (confirm('Are you sure?')) {
-    
-    const transactionToDelete = this.transactions.find(t => t.id === id);
-    
-    this.transactionService.deleteTransaction(id).subscribe({
+    if (!this.newTransaction.amount || !this.newTransaction.category) {
+      this.showError('Please specify the amount and category');
+      return;
+    }
+    this.http.post<any>(`${this.apiUrl}/transactions/`, { ...this.newTransaction }).subscribe({
       next: () => {
-        
-        this.transactions = this.transactions.filter(t => t.id !== id);
-        
-        
-        if (transactionToDelete) {
-          if (transactionToDelete.transaction_type === 'income') {
-            this.summary.total_income -= transactionToDelete.amount;
-          } else {
-            this.summary.total_expense -= transactionToDelete.amount;
-          }
-          this.summary.balance = this.summary.total_income - this.summary.total_expense;
-        }
+        this.newTransaction = { amount: null, description: '', category: null, transaction_type: 'expense' };
+        this.loadAll();
+        this.showSuccess('Transaction added!');
       },
-      error: () => this.showError('Failed to delete transaction')
+      error: (err) => this.showError('Error adding transaction: ' + err.status),
     });
   }
-}
+
+  deleteTransaction(id: number) {
+    if (!confirm('Delete transaction?')) return;
+    this.http.delete(`${this.apiUrl}/transactions/${id}/`).subscribe({
+      next: () => {
+        this.transactions = this.transactions.filter((t) => t.id !== id);
+        this.loadSummary();
+        this.loadProfile();
+        this.cdr.detectChanges();
+      },
+      error: (err) => this.showError('Error deleting transaction: ' + err.status),
+    });
+  }
 
   logout() {
     this.authService.logout();
   }
 
-  private showError(message: string) {
-    this.errorMessage = message;
-    setTimeout(() => this.errorMessage = '', 3000);
+  getCategoryName(id: number): string {
+    const cat = this.categories.find((c) => c.id === id);
+    return cat ? cat.name : '—';
   }
 
-  getCategoryName(categoryId: number): string {
-    const cat = this.categories.find(c => c.id === categoryId);
-    return cat ? cat.name : 'Unknown';
+  get rankConfig() {
+    return RANK_CONFIG[this.profile.rank] || RANK_CONFIG['bronze'];
+  }
+
+  get rankProgress(): number {
+    const r = this.rankConfig;
+    const range = r.maxXp - r.minXp;
+    if (range <= 0) return 100;
+    return Math.min(100, ((this.profile.xp - r.minXp) / range) * 100);
+  }
+
+  get nextRankLabel(): string {
+    const ranks = Object.keys(RANK_CONFIG);
+    const idx = ranks.indexOf(this.profile.rank);
+    if (idx >= 0 && idx < ranks.length - 1) {
+      const next = RANK_CONFIG[ranks[idx + 1]];
+      return `To "${next.label}": ${next.minXp - this.profile.xp} XP`;
+    }
+    return 'Maximum rank! 🏆';
+  }
+
+  get username(): string {
+    return localStorage.getItem('username') || 'user';
+  }
+
+  private showError(msg: string) {
+    this.errorMessage = msg;
+    setTimeout(() => (this.errorMessage = ''), 4000);
+  }
+
+  private showSuccess(msg: string) {
+    this.successMessage = msg;
+    setTimeout(() => (this.successMessage = ''), 2500);
   }
 }

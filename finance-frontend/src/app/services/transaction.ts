@@ -3,9 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Transaction, Category, Summary } from '../models/transaction.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TransactionService {
   private apiUrl = 'http://localhost:8000/api';
 

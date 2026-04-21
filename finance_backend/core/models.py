@@ -33,3 +33,34 @@ class Budget(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     monthly_limit = models.DecimalField(max_digits=10, decimal_places=2)
     month = models.DateField()
+
+class CryptoHolding(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    symbol = models.CharField(max_length=20)
+    amount = models.DecimalField(max_digits=20, decimal_places=8)
+    invested_usd = models.DecimalField(max_digits=15, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.symbol}"
+
+class CryptoTransaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    symbol = models.CharField(max_length=20)
+    amount_coin = models.DecimalField(max_digits=20, decimal_places=8)
+    price_usd = models.DecimalField(max_digits=15, decimal_places=2)
+    cost_kzt = models.DecimalField(max_digits=15, decimal_places=2)
+    date = models.DateField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.user.username} bought {self.amount_coin} {self.symbol}"
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    xp = models.IntegerField(default=0)
+    balance = models.DecimalField(max_digits=15, decimal_places=2, default=50000)
+
+    def get_rank(self):
+        if self.xp >= 7000: return 'diamond'
+        if self.xp >= 3500: return 'platinum'
+        if self.xp >= 1500: return 'gold'
+        if self.xp >= 500: return 'silver'
+        return 'bronze'

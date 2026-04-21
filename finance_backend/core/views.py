@@ -3,9 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from django.contrib.auth.models import User
-from .models import Transaction, Category
-from .serializers import RegisterSerializer, TransactionSerializer, CategorySerializer
+from decimal import Decimal
+from .models import Transaction, Category, CryptoHolding, CryptoTransaction, UserProfile
+from .serializers import RegisterSerializer, TransactionSerializer, CategorySerializer, CryptoHoldingSerializer, CryptoTransactionSerializer
+
 
 # FBV 1
 @api_view(['POST'])
@@ -64,3 +65,107 @@ class CategoryList(APIView):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_summary(request):
+    total_income  = Transaction.objects.total_by_user(request.user, 'income')
+    total_expense = Transaction.objects.total_by_user(request.user, 'expense')
+    total_crypto  = Transaction.objects.total_by_user(request.user, 'crypto')
+
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'balance': Decimal('50000')}
+    )
+
+    return Response({
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'total_crypto': total_crypto,
+        'balance': float(profile.balance),
+    })
+
+# FBV buy crypto
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def buy_crypto(request):
+    sym = request.data.get('symbol')
+    amount = request.data.get('amount')
+    price_usd = request.data.get('price_usd')
+
+    if not sym or amount is None or price_usd is None:
+        return Response({'error': 'symbol, amount and price_usd are required'}, status=400)
+
+    try:
+        amount = Decimal(str(amount))
+        price_usd = Decimal(str(price_usd))
+    except Exception:
+        return Response({'error': 'Invalid amount or price_usd'}, status=400)
+
+    KZT_RATE = Decimal('470')
+    cost_kzt = amount * price_usd * KZT_RATE
+
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'balance': Decimal('50000'), 'xp': 0}
+    )
+
+    if profile.balance < cost_kzt:
+        return Response({'error': 'Insufficient balance'}, status=400)
+
+    profile.balance = profile.balance - cost_kzt
+    profile.xp = profile.xp + int(amount * price_usd * Decimal('0.5'))
+    profile.save()
+
+    holding, _ = CryptoHolding.objects.get_or_create(
+        user=request.user,
+        symbol=sym,
+        defaults={'amount': Decimal('0'), 'invested_usd': Decimal('0')}
+    )
+    holding.amount = holding.amount + amount
+    holding.invested_usd = holding.invested_usd + (amount * price_usd)
+    holding.save()
+
+    CryptoTransaction.objects.create(
+        user=request.user,
+        symbol=sym,
+        amount_coin=amount,
+        price_usd=price_usd,
+        cost_kzt=cost_kzt,
+    )
+
+    crypto_cat, _ = Category.objects.get_or_create(
+        name='Crypto',
+        defaults={'type': 'expense'}
+    )
+    Transaction.objects.create(
+        user=request.user,
+        category=crypto_cat,
+        amount=cost_kzt,
+        description=f'Bought {amount} {sym} at ${price_usd}',
+        transaction_type='crypto',
+    )
+
+    return Response({
+        'message': 'Bought successfully',
+        'new_balance': str(profile.balance),
+        'xp': profile.xp,
+        'xp_gained': int(amount * price_usd * Decimal('0.5')),
+    }, status=201)
+
+# CBV - crypto wallet
+class CryptoWalletView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        holdings = CryptoHolding.objects.filter(user=request.user)
+        txs = CryptoTransaction.objects.filter(user=request.user).order_by('-date')
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        return Response({
+            'holdings': CryptoHoldingSerializer(holdings, many=True).data,
+            'transactions': CryptoTransactionSerializer(txs, many=True).data,
+            'xp': profile.xp,
+            'rank': profile.get_rank(),
+            'balance': profile.balance,
+        })
