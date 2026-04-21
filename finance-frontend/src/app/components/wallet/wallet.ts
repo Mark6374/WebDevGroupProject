@@ -59,10 +59,6 @@ export class WalletComponent implements OnInit {
   
   goToTopup() {
   this.router.navigate(['/topup']);
-}
-
-  goToTopup() {
-  this.router.navigate(['/topup']);
   }
 
   get totalInvested(): number {

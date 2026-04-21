@@ -13,9 +13,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view()),
     path('crypto/buy/', views.buy_crypto),
     path('crypto/wallet/', views.CryptoWalletView.as_view()),
-<<<<<<< HEAD
     path('crypto/sell/', views.sell_crypto),
-=======
->>>>>>> 49a321ec71f7f597d60fda71a9d28f712337b2fc
     path('topup/', views.topup_balance),
 ]
