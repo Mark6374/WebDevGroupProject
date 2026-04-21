@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Mogra&display=swap');
 :root {
   --c1: #0a0e1a;
   --c2: #111827;
@@ -33,7 +32,7 @@ html, body {
   height: 100%;
   background: var(--c1);
   color: var(--txt);
-  font-family: 'Syne', sans-serif;
+  font-family: 'JetBrains Mono', system-ui;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -66,9 +65,9 @@ html, body {
   gap: 10px;
 }
 
-.topbar-brand .logo { font-size: 22px; }
+.topbar-brand .logo { font-size: 24px; }
 .topbar-brand .name {
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.5px;
 }
@@ -80,7 +79,7 @@ html, body {
 }
 
 .topbar-balance {
-  font-family: 'DM Mono', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
   font-weight: 500;
   color: var(--acc);
@@ -91,7 +90,7 @@ html, body {
 }
 
 .btn {
-  font-family: 'Syne', sans-serif;
+  font-family: 'JetBrains Mono', sans-serif;
   cursor: pointer;
   border: none;
   border-radius: var(--radius-sm);
@@ -150,7 +149,7 @@ html, body {
 }
 
 .stat-card .stat-value {
-  font-family: 'DM Mono', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 22px;
   font-weight: 500;
 }
@@ -194,7 +193,7 @@ html, body {
 
 .form-group input,
 .form-group select {
-  font-family: 'Syne', sans-serif;
+  font-family: 'JetBrains Mono', sans-serif;
   background: var(--c3);
   border: 1px solid var(--c4);
   border-radius: var(--radius-sm);
@@ -252,7 +251,7 @@ html, body {
 .tx-sub { font-size: 11px; color: var(--txt3); margin-top: 2px;}
 
 .tx-amount {
-  font-family: 'DM Mono', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 15px;
   font-weight: 500;
   text-align: right;
@@ -335,7 +334,7 @@ html, body {
   background: transparent;
   border: none;
   color: var(--txt3);
-  font-family: 'Syne', sans-serif;
+  font-family: 'JetBrains Mono', sans-serif;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;

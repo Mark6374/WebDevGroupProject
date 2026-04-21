@@ -43,8 +43,8 @@
 }
 
 .auth-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 32px;
+  font-family: 'JetBrains Mono', sans-serif;
+  font-size: 36px;
   font-weight: 800;
   letter-spacing: -1px;
   color: var(--txt);
