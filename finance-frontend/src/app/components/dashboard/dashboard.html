@@ -5,7 +5,6 @@
 
   <header class="topbar">
     <div class="topbar-brand">
-      <span class="logo">💎</span>
       <div>
         <div class="name">Wallet</div>
         <div style="font-size:11px;color:var(--txt3);">Hello, {{ username }}!</div>
@@ -39,18 +38,19 @@
         <div class="stat-value green">₸{{ summary.total_income | number:'1.0-0' }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Expense</div>
-        <div class="stat-value red">₸{{ summary.total_expense | number:'1.0-0' }}</div>
-      </div>
-      <div class="stat-card">
         <div class="stat-label">Balance</div>
         <div class="stat-value acc">₸{{ summary.balance | number:'1.0-0' }}</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-label">Expense</div>
+        <div class="stat-value red">₸{{ summary.total_expense | number:'1.0-0' }}</div>
+      </div>  
     </div>
 
     <div style="display:flex;gap:10px;padding:16px 24px 0;">
-      <button class="btn btn-acc" style="flex:1;" routerLink="/crypto">🪙 Crypto wallet</button>
-      <button class="btn btn-ghost" style="flex:1;" routerLink="/history">📋 History</button>
+      <button class="btn btn-acc" style="flex:1;" routerLink="/crypto">Crypto wallet</button>
+      <button class="btn btn-ghost" style="flex:1;" routerLink="/history">History</button>
+      <button class="btn btn-ghost" style="flex:1;" routerLink="/statistics">Statistics</button>
     </div>
 
     <div class="form-section">
@@ -77,8 +77,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Description</label>
-          <input type="text" [(ngModel)]="newTransaction.description" placeholder="Description(Optional)" />
+          <label>Name</label>
+          <input type="text" [(ngModel)]="newTransaction.description" placeholder="(Optional)" />
         </div>
       </div>
       <button (click)="addTransaction()" class="btn btn-acc btn-full" style="margin-top:12px;">

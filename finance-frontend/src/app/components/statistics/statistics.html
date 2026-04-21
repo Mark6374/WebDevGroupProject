@@ -1,0 +1,182 @@
+<div class="page-wrapper">
+
+  <div *ngIf="errorMessage" class="error-toast">{{ errorMessage }}</div>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="name">Statistics</div>
+    </div>
+    <button (click)="loadData()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;">⟳</button>
+  </header>
+
+  <div class="content-scroll">
+
+    @if (loading) {
+      <div class="empty-state" style="padding-top:80px;">
+        <div class="empty-icon">⏳</div>
+        <p>Analyzing data...</p>
+      </div>
+    }
+
+    @if (!loading) {
+
+      <div class="kpi-grid">
+        <div class="kpi-card income-card">
+          <div class="kpi-label">Income</div>
+          <div class="kpi-value">{{ fmt(totalIncome) }}</div>
+        </div>
+        <div class="kpi-card expense-card">
+          <div class="kpi-label">Expenses</div>
+          <div class="kpi-value">{{ fmt(totalExpense) }}</div>
+        </div>
+        <div class="kpi-card savings-card">
+          <div class="kpi-label">Savings Percentage</div>
+          <div class="kpi-value" [style.color]="savingsRate >= 0 ? 'var(--green)' : 'var(--red)'">
+            {{ savingsRate }}%
+          </div>
+        </div>
+        <div class="kpi-card avg-card">
+          <div class="kpi-label">Average Daily Spending</div>
+          <div class="kpi-value">{{ fmt(avgDaily) }}</div>
+        </div>
+      </div>
+
+      <div class="balance-bar-card">
+        <div class="balance-bar-head">
+          <span class="balance-bar-label">Income vs Expenses</span>
+          <span class="balance-bar-net" [style.color]="totalIncome >= totalExpense ? 'var(--green)' : 'var(--red)'">
+            {{ totalIncome >= totalExpense ? '+' : '' }}{{ fmt(totalIncome - totalExpense) }}
+          </span>
+        </div>
+        <div class="balance-track">
+          <div class="balance-fill income-fill"
+               [style.width.%]="totalIncome + totalExpense > 0 ? (totalIncome / (totalIncome + totalExpense)) * 100 : 50">
+          </div>
+          <div class="balance-fill expense-fill"
+               [style.width.%]="totalIncome + totalExpense > 0 ? (totalExpense / (totalIncome + totalExpense)) * 100 : 50">
+          </div>
+        </div>
+        <div class="balance-bar-legend">
+          <span class="legend-dot income-dot"></span> Income
+          <span class="legend-dot expense-dot" style="margin-left:16px;"></span> Expenses
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-head">
+          <span>Activity over 14 Days</span>
+          <div class="chart-legend">
+            <span><span class="legend-dot income-dot"></span>Income</span>
+            <span><span class="legend-dot expense-dot"></span>Expenses</span>
+          </div>
+        </div>
+
+        @if (transactions.length === 0) {
+          <div class="empty-state" style="padding:32px 0;">
+            <div class="empty-icon" style="font-size:28px;">📭</div>
+            <p>No transactions to display</p>
+          </div>
+        } @else {
+          <div class="bar-chart">
+            @for (day of dailyStats; track day.date; let i = $index) {
+              <div class="bar-col" (mouseenter)="hoveredBar = i" (mouseleave)="hoveredBar = null">
+                <div class="bar-tooltip" [class.visible]="hoveredBar === i">
+                  <div class="tooltip-date">{{ day.label }}</div>
+                  @if (day.income > 0) {
+                    <div class="tooltip-row income-txt">+{{ fmt(day.income) }}</div>
+                  }
+                  @if (day.expense > 0) {
+                    <div class="tooltip-row expense-txt">-{{ fmt(day.expense) }}</div>
+                  }
+                  @if (day.income === 0 && day.expense === 0) {
+                    <div class="tooltip-row" style="color:var(--txt3);">No activity</div>
+                  }
+                </div>
+                <div class="bars-wrap">
+                  <div class="bar income-bar"  [style.height.%]="barHeight(day.income)"></div>
+                  <div class="bar expense-bar" [style.height.%]="barHeight(day.expense)"></div>
+                </div>
+                <div class="bar-label">{{ day.label.split(' ')[0] }}</div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card-head">
+          <span>By Categories</span>
+          <div class="donut-tabs">
+            <button [class.active]="activeDonut === 'expense'" (click)="activeDonut = 'expense'">Expenses</button>
+            <button [class.active]="activeDonut === 'income'"  (click)="activeDonut = 'income'">Income</button>
+          </div>
+        </div>
+
+        @if (activeDonutStats.length === 0) {
+          <div class="empty-state" style="padding:32px 0;">
+            <div class="empty-icon" style="font-size:28px;">📭</div>
+            <p>No data available</p>
+          </div>
+        } @else {
+          <div class="donut-layout">
+            <div class="donut-wrap">
+              <svg viewBox="0 0 160 160" class="donut-svg">
+                @for (seg of activeDonutStats; track seg.name; let i = $index) {
+                  <path [attr.d]="donutPath(activeDonutStats, i)"
+                        [attr.fill]="seg.color"
+                        class="donut-seg">
+                  </path>
+                }
+                <text x="80" y="74" class="donut-center-label">Total</text>
+                <text x="80" y="93" class="donut-center-value">{{ activeDonutStats.length }}</text>
+                <text x="80" y="107" class="donut-center-sub">Categories</text>
+              </svg>
+            </div>
+
+            <div class="donut-legend">
+              @for (seg of activeDonutStats; track seg.name) {
+                <div class="donut-leg-item">
+                  <div class="donut-leg-dot" [style.background]="seg.color"></div>
+                  <div class="donut-leg-info">
+                    <div class="donut-leg-name">{{ seg.name }}</div>
+                    <div class="donut-leg-val">{{ fmt(seg.amount) }}</div>
+                  </div>
+                  <div class="donut-leg-pct" [style.color]="seg.color">{{ seg.percent }}%</div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="chart-card" style="margin-bottom:24px;">
+        <div class="chart-card-head"><span>Top Transactions</span></div>
+        <div class="top-tx-grid">
+          @if (biggestIncome) {
+            <div class="top-tx-item income-border">
+              <div class="top-tx-badge income-badge">MAX Income</div>
+              <div class="top-tx-amount income-txt">+{{ fmt(biggestIncome.amount) }}</div>
+              <div class="top-tx-desc">{{ biggestIncome.description || getCatName(biggestIncome.category) }}</div>
+              <div class="top-tx-date">{{ biggestIncome.date | date:'dd.MM.yyyy' }}</div>
+            </div>
+          }
+          @if (biggestExpense) {
+            <div class="top-tx-item expense-border">
+              <div class="top-tx-badge expense-badge">MAX Expense</div>
+              <div class="top-tx-amount expense-txt">-{{ fmt(biggestExpense.amount) }}</div>
+              <div class="top-tx-desc">{{ biggestExpense.description || getCatName(biggestExpense.category) }}</div>
+              <div class="top-tx-date">{{ biggestExpense.date | date:'dd.MM.yyyy' }}</div>
+            </div>
+          }
+          @if (!biggestIncome && !biggestExpense) {
+            <div class="empty-state" style="padding:24px;grid-column:1/-1;">
+              <p>No transactions to display</p>
+            </div>
+          }
+        </div>
+      </div>
+
+    }
+  </div>
+  <app-navbar></app-navbar>
+</div>

@@ -4,7 +4,6 @@
 
   <header class="topbar">
     <div class="topbar-brand">
-      <span class="logo">💰</span>
       <div class="name">Wallet</div>
     </div>
     <button (click)="loadWallet()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;">⟳</button>
@@ -40,9 +39,10 @@
           <div class="stat-label">Total Invested ($)</div>
           <div class="stat-value">${{ totalInvested | number:'1.2-2' }}</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" style="position:relative;">
           <div class="stat-label">Balance (₸)</div>
           <div class="stat-value acc">₸{{ balance | number:'1.0-0' }}</div>
+          <button (click)="goToTopup()" class="topup-btn">+ Top up</button>
         </div>
       </div>
 
@@ -50,7 +50,6 @@
       <div style="padding:0 24px;">
         @if (holdings.length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">💎</div>
             <p>No assets. Buy your first coin!</p>
           </div>
         }
@@ -77,7 +76,6 @@
       <div style="padding:0 24px;">
         @if (transactions.length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">📈</div>
             <p>No transactions yet</p>
           </div>
         }

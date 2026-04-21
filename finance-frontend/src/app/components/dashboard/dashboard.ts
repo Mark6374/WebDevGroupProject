@@ -145,7 +145,7 @@ export class DashboardComponent implements OnInit {
       const next = RANK_CONFIG[ranks[idx + 1]];
       return `To "${next.label}": ${next.minXp - this.profile.xp} XP`;
     }
-    return 'Maximum rank! 🏆';
+    return 'Maximum rank!';
   }
 
   get username(): string {

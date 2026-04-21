@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar';
 import { RANK_CONFIG } from '../../models/transaction.model';
 import { AuthService } from '../../services/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-wallet',
@@ -27,7 +28,8 @@ export class WalletComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private auth: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -53,6 +55,10 @@ export class WalletComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  goToTopup() {
+  this.router.navigate(['/topup']);
   }
 
   get totalInvested(): number {

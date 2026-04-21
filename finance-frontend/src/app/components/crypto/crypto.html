@@ -1,14 +1,13 @@
 <div class="page-wrapper">
 
-  <div *ngIf="errorMessage" class="error-toast">{{ errorMessage }}</div>
+  <div *ngIf="errorMessage"   class="error-toast">{{ errorMessage }}</div>
   <div *ngIf="successMessage" class="success-toast">{{ successMessage }}</div>
 
   <header class="topbar">
     <div class="topbar-brand">
-      <span class="logo">🪙</span>
-      <div class="name">Crypto Market</div>
+      <div class="name">Crypto market</div>
     </div>
-    <button (click)="fetchPrices()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;"> ⟳ Update</button>
+    <button (click)="fetchPrices()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;">⟳</button>
   </header>
 
   <div class="content-scroll">
@@ -21,7 +20,8 @@
     }
 
     @if (!loading) {
-      <div class="section-label">Select a coin</div>
+
+      <div class="section-label">Choose a coin</div>
       <div class="coin-grid" style="padding:0 24px;">
         @for (coin of coins; track coin.sym) {
           <div class="coin-card" [class.selected]="selectedCoin?.sym === coin.sym" (click)="selectCoin(coin)">
@@ -36,49 +36,87 @@
       </div>
 
       @if (selectedCoin) {
+
         <div class="chart-box">
           <div class="chart-head">
-            <span>{{ selectedCoin.sym }} / USD - 24h</span>
+            <span>{{ selectedCoin.sym }} / USD — 24h</span>
             <span class="chart-price">${{ selectedCoin.price | number:'1.2-2' }}</span>
           </div>
           <svg id="crypto-chart-svg" viewBox="0 0 300 90" class="chart-svg" preserveAspectRatio="none"></svg>
         </div>
 
-        <div class="buy-panel">
-          <div class="buy-panel-head">
-            <span>Купить {{ selectedCoin.sym }}</span>
-            <span class="buy-price-hint">≈ ₸{{ selectedCoin.price * KZT_PER_USD | number:'1.0-0' }} / coin</span>
+        <div class="trade-panel">
+
+          <div class="trade-tabs">
+            <button [class.active-buy]="mode === 'buy'"   (click)="setMode('buy')"> Buy</button>
+            <button [class.active-sell]="mode === 'sell'" (click)="setMode('sell')"> Sell</button>
           </div>
-          <div class="buy-input-row">
-            <div class="form-group" style="flex:1;">
-              <label>Quantity</label>
-              <input type="number" [(ngModel)]="buyAmount" placeholder="0.001" step="0.001" min="0" />
-            </div>
+
+          @if (mode === 'sell') {
+            @if (selectedHolding) {
+              <div class="holding-info">
+                <span class="holding-info-label">In stock</span>
+                <span class="holding-info-val">{{ selectedHolding.amount | number:'1.4-8' }} {{ selectedCoin.sym }}</span>
+              </div>
+            } @else {
+              <div class="holding-info no-holding">
+                You don't have any {{ selectedCoin.sym }} to sell
+              </div>
+            }
+          }
+
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Quantity</label>
+            <input type="number" [(ngModel)]="tradeAmount" placeholder="0.001" step="0.001" min="0" />
           </div>
-          @if (buyAmount && buyAmount > 0) {
-            <div class="buy-summary">
-              <div class="buy-sum-row">
-                <span>{{ buyAmount }} {{ selectedCoin.sym }}</span>
+
+          @if (mode === 'sell' && selectedHolding) {
+            <button class="btn-max" (click)="tradeAmount = selectedHolding!.amount">
+              Sell all ({{ selectedHolding.amount | number:'1.4-6' }})
+            </button>
+          }
+          @if (tradeAmount && tradeAmount > 0) {
+            <div class="trade-summary">
+              <div class="trade-sum-row">
+                <span>{{ tradeAmount }} {{ selectedCoin.sym }}</span>
                 <span>${{ totalCostUSD | number:'1.2-2' }}</span>
               </div>
-              <div class="buy-sum-row accent">
-                <span>Total to pay</span>
+              @if (mode === 'sell' && selectedHolding) {
+                <div class="trade-sum-row" [style.color]="profitUSD >= 0 ? 'var(--green)' : 'var(--red)'">
+                  <span>P&L</span>
+                  <span>{{ profitUSD >= 0 ? '+' : '' }}${{ profitUSD | number:'1.2-2' }}</span>
+                </div>
+              }
+              <div class="trade-sum-row accent" [class.sell-accent]="mode === 'sell'">
+                <span>{{ mode === 'buy' ? 'To pay' : 'Get' }}</span>
                 <span>₸{{ totalCostKZT | number:'1.0-0' }}</span>
               </div>
             </div>
           }
-          <button class="btn btn-acc btn-full" style="margin-top:14px;" (click)="buyCrypto()" [disabled]="buying">
-            {{ buying ? 'Purchasing...' : '🚀 Buy' }}
+
+          <button
+            class="btn btn-full"
+            [class.btn-acc]="mode === 'buy'"
+            [class.btn-sell]="mode === 'sell'"
+            style="margin-top:14px;"
+            (click)="executeTrade()"
+            [disabled]="trading">
+            @if (!trading) {
+              {{ mode === 'buy' ? ' Buy' : ' Sell' }} {{ selectedCoin.sym }}
+            } @else {
+              Executing trade...
+            }
           </button>
+
         </div>
       }
 
       @if (!selectedCoin) {
         <div class="empty-state">
-          <div class="empty-icon">👆</div>
-          <p>Select a coin above to buy</p>
+          <p>Select a coin above</p>
         </div>
       }
+
     }
 
   </div>

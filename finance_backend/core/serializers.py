@@ -30,7 +30,7 @@ class CryptoHoldingSerializer(serializers.ModelSerializer):
 class CryptoTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CryptoTransaction
-        fields = ['id', 'symbol', 'amount_coin', 'price_usd', 'cost_kzt', 'date']
+        fields = ['id', 'symbol', 'amount_coin', 'price_usd', 'cost_kzt', 'trade_type', 'date']
 
 class UserProfileSerializer(serializers.Serializer):
     xp = serializers.IntegerField()

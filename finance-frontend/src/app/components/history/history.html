@@ -4,7 +4,6 @@
 
   <header class="topbar">
     <div class="topbar-brand">
-      <span class="logo">📋</span>
       <div class="name">History</div>
     </div>
     <button (click)="loadAll()" class="btn btn-ghost" style="font-size:12px;padding:7px 12px;">⟳</button>
@@ -46,7 +45,6 @@
       <div style="padding:0 24px;">
         @if (filtered.length === 0) {
           <div class="empty-state">
-            <div class="empty-icon">🗒️</div>
             <p>No records in this category</p>
           </div>
         }

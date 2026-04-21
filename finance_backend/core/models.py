@@ -44,11 +44,14 @@ class CryptoHolding(models.Model):
         return f"{self.user.username} - {self.symbol}"
 
 class CryptoTransaction(models.Model):
+    TRADE_TYPES = [('buy', 'Buy'), ('sell', 'Sell')]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     symbol = models.CharField(max_length=20)
     amount_coin = models.DecimalField(max_digits=20, decimal_places=8)
     price_usd = models.DecimalField(max_digits=15, decimal_places=2)
     cost_kzt = models.DecimalField(max_digits=15, decimal_places=2)
+    trade_type= models.CharField(max_length=4, choices=TRADE_TYPES, default='buy')
     date = models.DateField(auto_now_add=True)
     def __str__(self):
         return f"{self.user.username} bought {self.amount_coin} {self.symbol}"
