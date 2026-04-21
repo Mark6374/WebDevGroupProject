@@ -1,31 +1,116 @@
-<div class="page-wrapper">
-  <header class="topbar">
-    <button (click)="goBack()" class="btn-back">← Назад</button>
-    <div class="topbar-title">Пополнение</div>
-  </header>
+<div class="topup-page">
+
+  <div class="navbar">
+    <div class="nav-left">
+      <button class="nav-back" (click)="goBack()">← Back</button>
+      <span class="nav-title">💎 WALLET</span>
+    </div>
+    <div class="nav-balance">₸{{ balance | number:'1.0-0' }}</div>
+  </div>
 
   <div class="content">
-    <div class="amount-display">₸{{ (amount || 0) | number:'1.0-0' }}</div>
 
-    <div class="quick-grid">
-      <button (click)="quickSet(1000)">₸1,000</button>
-      <button (click)="quickSet(5000)">₸5,000</button>
-      <button (click)="quickSet(10000)">₸10,000</button>
-      <button (click)="quickSet(20000)">₸20,000</button>
+    <div class="amount-display">
+      <div class="amount-label">Top-up amount</div>
+      <div class="amount-value">₸{{ (amount || 0) | number:'1.0-0' }}</div>
     </div>
 
-    <input
-      type="number"
-      [(ngModel)]="amount"
-      placeholder="Өз сомасын енгіз..."
-      class="custom-input"
-    />
+    <div class="section-title">Quick amounts</div>
+    <div class="quick-amounts">
+      <button class="quick-btn" [class.active]="amount === 1000" (click)="quickSet(1000)">₸1,000</button>
+      <button class="quick-btn" [class.active]="amount === 5000" (click)="quickSet(5000)">₸5,000</button>
+      <button class="quick-btn" [class.active]="amount === 10000" (click)="quickSet(10000)">₸10,000</button>
+      <button class="quick-btn" [class.active]="amount === 20000" (click)="quickSet(20000)">₸20,000</button>
+    </div>
+
+    <div class="custom-input-wrap">
+      <input class="custom-input" type="number" [(ngModel)]="amount" placeholder="Немесе өз сомасын енгіз..." min="0" />
+    </div>
+
+    <div class="fee-info">
+      <span class="fee-label">Fee</span>
+      <span class="fee-value">{{ feeText }}</span>
+    </div>
+
+    <div class="method-section">
+      <div class="section-title">Payment method</div>
+      <div class="methods-grid">
+
+        <div class="method-card" [class.active]="selectedMethod === 'card'" (click)="selectMethod('card')">
+          <div class="method-icon card-icon">💳</div>
+          <div class="method-info">
+            <div class="method-name">Bank card</div>
+            <div class="method-desc">Visa / Mastercard</div>
+          </div>
+          <div class="method-check"></div>
+        </div>
+
+        <div class="method-card" [class.active]="selectedMethod === 'crypto'" (click)="selectMethod('crypto')">
+          <div class="method-icon crypto-icon">₿</div>
+          <div class="method-info">
+            <div class="method-name">Крипто</div>
+            <div class="method-desc">BTC / ETH / USDT</div>
+          </div>
+          <div class="method-check"></div>
+        </div>
+
+        <div class="method-card" [class.active]="selectedMethod === 'transfer'" (click)="selectMethod('transfer')">
+          <div class="method-icon transfer-icon">🏦</div>
+          <div class="method-info">
+            <div class="method-name">Transfer</div>
+            <div class="method-desc">Bank transfer</div>
+          </div>
+          <div class="method-check"></div>
+        </div>
+
+        <div class="method-card" [class.active]="selectedMethod === 'mobile'" (click)="selectMethod('mobile')">
+          <div class="method-icon mobile-icon">📱</div>
+          <div class="method-info">
+            <div class="method-name">Mobile</div>
+            <div class="method-desc">Kaspi / Halyk</div>
+          </div>
+          <div class="method-check"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card-form" *ngIf="selectedMethod === 'card'">
+      <div class="section-title" style="margin-bottom:12px">Card details</div>
+      <div class="field-group">
+        <div class="field-label">Card number</div>
+        <input class="field-input" placeholder="0000 0000 0000 0000" maxlength="19" [(ngModel)]="cardNumber" (input)="formatCard()" />
+      </div>
+      <div class="card-row">
+        <div class="field-group">
+          <div class="field-label">Expiry</div>
+          <input class="field-input" placeholder="MM/YY" maxlength="5" [(ngModel)]="cardExpiry" (input)="formatExpiry()" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">CVV</div>
+          <input class="field-input" placeholder="***" maxlength="3" type="password" [(ngModel)]="cardCvv" />
+        </div>
+      </div>
+      <div class="field-group" style="margin-bottom:0">
+        <div class="field-label">Cardholder name</div>
+        <input class="field-input" placeholder="AIBEK NURLANOVICH" style="text-transform:uppercase" [(ngModel)]="cardName" />
+      </div>
+    </div>
 
     <div *ngIf="successMsg" class="success-msg">✓ {{ successMsg }}</div>
     <div *ngIf="errorMsg" class="error-msg">✗ {{ errorMsg }}</div>
 
-    <button (click)="submit()" [disabled]="loading" class="confirm-btn">
-      {{ loading ? 'Жүктелуде...' : '+ ПОПОЛНИТЬ' }}
-    </button>
+    <div class="wrapper">
+      <button class="confirm-btn" [disabled]="loading || !amount || amount <= 0" (click)="submit()">
+        {{ loading ? 'Processing...' : '+ TOP UP ₸' + ((amount || 0) | number:'1.0-0') }}
+      </button>
+
+      <div class="success-overlay" [class.show]="showOverlay">
+        <div class="success-icon">✓</div>
+        <div class="success-text">Top-up successful!</div>
+        <div class="success-sub">₸{{ lastAmount | number:'1.0-0' }} added to balance</div>
+      </div>
+    </div>
+
   </div>
 </div>
