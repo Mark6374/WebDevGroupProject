@@ -66,6 +66,13 @@ class CategoryList(APIView):
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
     
+    def post(self, request):  
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+    
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_summary(request):
@@ -265,3 +272,15 @@ def topup_balance(request):
         'message': 'Баланс толтырылды',
         'new_balance': str(profile.balance)
     }, status=200)
+
+
+class CategoryDetail(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def delete(self, request, pk):
+        try:
+            category = Category.objects.get(pk=pk)
+            category.delete()
+            return Response(status=204)
+        except Category.DoesNotExist:
+            return Response({"error": "Category not found"}, status=404)

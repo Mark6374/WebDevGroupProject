@@ -15,4 +15,5 @@ urlpatterns = [
     path('crypto/wallet/', views.CryptoWalletView.as_view()),
     path('crypto/sell/', views.sell_crypto),
     path('topup/', views.topup_balance),
+    path('categories/<int:pk>/', views.CategoryDetail.as_view()),
 ]
